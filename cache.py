@@ -70,18 +70,18 @@ class Cache(object):
 
 
 if __name__ == "__main__":
-	import redis, time
+    import redis, time
 
-	conn = redis.StrictRedis()
-	cache = Cache(storage=RedisCache(conn))
-    
-	@cache.cache_fn(key=lambda x, y:(x[0], y["loc"]), life_time=5) # key由第一个args参数和kwargs的loc参数决定
-	def xx(x, y, loc=None):
-	    return x
-    
-	print xx([12,23],2,loc=3) # *1
-	print xx([12,23],5, loc=3) # *2, *1 和 *2 缓冲为1条
-	print xx(3,5,loc=4)
+    conn = redis.StrictRedis()
+    cache = Cache(storage=RedisCache(conn))
+
+    @cache.cache_fn(key=lambda x, y:(x[0], y["loc"]), life_time=5) # key由第一个args参数和kwargs的loc参数决定
+    def xx(x, y, loc=None):
+        return x
+
+    print xx([12,23],2,loc=3) # *1
+    print xx([12,23],5, loc=3) # *2, *1 和 *2 缓冲为1条
+    print xx(3,5,loc=4)
 
 
 
