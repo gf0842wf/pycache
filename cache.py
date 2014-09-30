@@ -79,8 +79,8 @@ if __name__ == "__main__":
     def xx(x, y, loc=None):
         return x
 
-    print xx([12,23],2,loc=3) # *1
-    print xx([12,23],5, loc=3) # *2, *1 和 *2 缓冲为1条
+    print xx(1,2,loc=3) # *1
+    print xx(1,5,loc=3) # *2, *1 和 *2 缓冲为1条
     print xx(3,5,loc=4)
 
 
