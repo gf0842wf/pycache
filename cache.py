@@ -7,12 +7,12 @@ class BaseCache(object):
 
     def __init__(self):
         self.storage = {}
-	    
-	def get(self, key, default=None):
-	    return self.storage.get(key, default)
+        
+    def get(self, key, default=None):
+        return self.storage.get(key, default)
 
-	def set(self, key, val, life_time):
-	    self.storage[key] = val
+    def set(self, key, val, life_time):
+        self.storage[key] = val
 
 
 class RedisCache(object):
