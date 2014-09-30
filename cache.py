@@ -5,8 +5,8 @@ from functools import wraps, partial
 
 class BaseCache(object):
 
-	def __init__(self):
-		self.storage = {}
+    def __init__(self):
+        self.storage = {}
 	    
 	def get(self, key, default=None):
 	    return self.storage.get(key, default)
@@ -17,15 +17,15 @@ class BaseCache(object):
 
 class RedisCache(object):
 
-	def __init__(self, conn):
-		self.conn = conn
+    def __init__(self, conn):
+        self.conn = conn
 	    
-	def get(self, key, default=None):
-	    return self.conn.get(key) or default
+    def get(self, key, default=None):
+        return self.conn.get(key) or default
 
-	def set(self, key, val, life_time):
-	    self.conn.set(key, val) #, ex=life_time)
-	    self.conn.expire(key, life_time)
+    def set(self, key, val, life_time):
+        self.conn.set(key, val) #, ex=life_time)
+        self.conn.expire(key, life_time)
 
 
 class Cache(object):
@@ -43,7 +43,6 @@ class Cache(object):
             @wraps(fn)
             def wrapper(*args, **kwargs):
                 mkey = self.gen_key(fn, key, args, kwargs)
-                print mkey
                 result = self.get(mkey, None)
                 if result:
                     return result
@@ -77,8 +76,8 @@ if __name__ == "__main__":
 	cache = Cache(storage=RedisCache(conn))
     
 	@cache.cache_fn(key=lambda x, y:(x[0], y["loc"]), life_time=5) # key由第一个args参数和kwargs的loc参数决定
-	def xx(x, y, loc=(2,3)):
-	    return y
+	def xx(x, y, loc=None):
+	    return x
     
 	print xx([12,23],2,loc=3) # *1
 	print xx([12,23],5, loc=3) # *2, *1 和 *2 缓冲为1条
