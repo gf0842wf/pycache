@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*-
 
-from functools import wraps, partial
+from functools import wraps
+import time
+
+now = lambda: int(time.time())
 
 
 class BaseCache(object):
 
-    def __init__(self):
-        self.storage = {}
+    def __init__(self, max_nums=10000):
+        self.max_nums = max_nums
+        self.storage = {} # [val, count, now()]
         
     def get(self, key, default=None):
-        return self.storage.get(key, default)
+        v = self.storage.get(key)
+        if v:
+            return v[0]
+        else:
+            return default
 
     def set(self, key, val, life_time):
-        self.storage[key] = val
+        if len(self.storage) > self.max_nums - 1:
+            min_key = min(self.storage.iteritems(), key=lambda x: (x[1][1], x[1][2]))
+            if min_key:
+                self.storage.pop(min_key[0], None)
+        storage = self.storage.get(key) or [None, 0, 0]
+        storage[0] = val
+        storage[1] += 1
+        storage[2] += now()
 
 
 class RedisCache(object):
@@ -30,8 +45,8 @@ class RedisCache(object):
 
 class Cache(object):
 
-    def __init__(self, storage=None, max_nums=10000):
-        self.storage = storage or BaseCache()
+    def __init__(self, storage=None):
+        self.storage = storage or BaseCache(max_nums=1000)
 
     def cache_fn(self, key=None, life_time=0):
         """
@@ -59,7 +74,7 @@ class Cache(object):
             mkey = repr(key(args, kwargs))
         else:
             mkey = repr((args, kwargs))
-        mkey = ":".join([str(id(self)), fn.func_name, mkey])
+        mkey = ":".join(["pycache", str(id(self)), fn.func_name, mkey])
         return mkey
         
     def get(self, key, default=None):
@@ -83,6 +98,14 @@ if __name__ == "__main__":
     print xx(1,5,loc=3) # *2, *1 和 *2 缓冲为1条
     print xx(3,5,loc=4)
 
+
+    cache = Cache(storage=BaseCache(max_nums=2))
+    def xx(x, y, loc=None):
+        return x
+
+    print xx(1,2,loc=3) # *1
+    print xx(1,5,loc=3) # *2, *1 和 *2 缓冲为1条
+    print xx(3,5,loc=4)
 
 
     
